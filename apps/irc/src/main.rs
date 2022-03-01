@@ -13,6 +13,7 @@ use num_traits::*;
 use rkyv::*;
 use std::{sync::Arc, thread};
 use xous_ipc::Buffer;
+use com::api::WlanStatus;
 
 #[derive(Debug, num_derive::FromPrimitive, num_derive::ToPrimitive)]
 pub(crate) enum ReplOp {
@@ -24,6 +25,9 @@ pub(crate) enum ReplOp {
     ChangeFocus,
     /// exit the application
     Quit,
+
+    /// handle connection status changes
+    NetStateUpdate,
 
     MessageReceived,
     MessageSent,
@@ -44,6 +48,31 @@ fn xmain() -> ! {
         .register_name(SERVER_NAME_REPL, None)
         .expect("can't register server");
     // log::trace!("registered with NS -- {:?}", sid);
+
+    let cb_cid = xous::connect(sid).unwrap();
+    let mut netmgr = net::NetManager::new();
+    netmgr.wifi_state_subscribe(cb_cid, ReplOp::NetStateUpdate.to_u32().unwrap()).unwrap();
+
+    // this will make the IRC app appear to "hang" until wifi is connected by the system. this could be handled more gracefully, but
+    // with a bit more code complexity.
+    loop {
+        let msg = xous::receive_message(sid).unwrap();
+        match FromPrimitive::from_usize(msg.body.id()) {
+            Some(ReplOp::NetStateUpdate) => {
+                let buffer = unsafe {
+                    xous_ipc::Buffer::from_memory_message(msg.body.memory_message().unwrap())
+                };
+                let wifi_status = WlanStatus::from_ipc(buffer.to_original::<com::WlanStatusIpc, _>().unwrap());
+                if wifi_status.link_state == com_rs_ref::LinkState::Connected {
+                    break;
+                }
+                // otherwise keep waiting
+            }
+            _ => {
+                log::info!("Network not yet connected, IRC app cannot start");
+            }
+        }
+    }
 
     let connection = IRCConnection {
         callback_sid: sid,

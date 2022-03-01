@@ -1079,8 +1079,6 @@ checksum = "5af1f635ef1bc545d78392b136bfe1c9809e029023c84a3638a864a10b8819c8"
 [[package]]
 name = "hiirc"
 version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36c8a7835ad5349165c401e09cd2e72c98d4b73607805ba399e94f7b0e978a90"
 dependencies = [
  "encoding",
  "loirc",
@@ -1171,6 +1169,7 @@ version = "0.1.0"
 dependencies = [
  "codec",
  "com",
+ "com_rs-ref",
  "content-plugin-api",
  "encoding",
  "gam",
@@ -1183,6 +1182,7 @@ dependencies = [
  "log",
  "log-server",
  "loirc",
+ "net",
  "num-derive",
  "num-traits",
  "rkyv",
@@ -1376,10 +1376,9 @@ dependencies = [
 [[package]]
 name = "loirc"
 version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "20456986a5a085e240a37488d79b326806f84979d60157dbeebcbe3ca63219cb"
 dependencies = [
  "encoding",
+ "net",
 ]
 
 [[package]]
