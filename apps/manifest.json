@@ -20,5 +20,14 @@
                 "en-audio": "Basic REPL demo"
             }
         }
+    },
+    "irc": {
+        "context_name": "irc demo app",
+        "menu_name": {
+            "appmenu.irc": {
+                "en": "Basic IRC demo",
+                "en-audio": "Basic IRC demo"
+            }
+        }
     }
 }

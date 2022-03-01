@@ -37,6 +37,7 @@ default-members = [
   "services/modals",
   "apps/ball",
   "apps/repl",
+  "apps/irc",
 ]
 members = [
   "xous-ipc",
@@ -88,6 +89,7 @@ members = [
   "services/modals",
   "apps/ball",
   "apps/repl",
+  "apps/irc",
   "kernel",
 ]
 resolver = "2"
