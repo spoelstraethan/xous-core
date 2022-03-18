@@ -63,6 +63,8 @@ pub(crate) enum StatusOpcode {
 
     /// Suspend handler from the main menu
     TrySuspend,
+    /// Ship mode handler for the main menu
+    BatteryDisconnect,
     /// for returning wifi stats
     WifiStats,
     Quit,
@@ -318,7 +320,7 @@ fn xmain() -> ! {
     let batt_interval;
     let secnotes_interval;
     if cfg!(feature = "braille") {
-        // lower the status output rate for braille mode, debugging, etc.
+        // lower the status output rate for braille mode - it's invisible anyways, this is mainly for the debug configuration
         batt_interval = 60;
         secnotes_interval = 30;
     } else {
@@ -361,6 +363,18 @@ fn xmain() -> ! {
     log::debug!("subscribe to wifi updates");
     netmgr.wifi_state_subscribe(cb_cid, StatusOpcode::WifiStats.to_u32().unwrap()).unwrap();
     let mut wifi_status: WlanStatus = WlanStatus::from_ipc(WlanStatusIpc::default());
+
+    #[cfg(feature="tts")]
+    thread::spawn({
+        move || {
+            // indicator of boot-up for blind users
+            let tt = ticktimer_server::Ticktimer::new().unwrap();
+            tt.sleep_ms(1500).unwrap();
+            let xns = xous_names::XousNames::new().unwrap();
+            let llio = llio::Llio::new(&xns);
+            llio.vibe(llio::VibePattern::Double).unwrap();
+        }
+    });
     log::info!("|status: starting main loop"); // don't change this -- factory test looks for this exact string
     loop {
         let msg = xous::receive_message(status_sid).unwrap();
@@ -754,6 +768,18 @@ fn xmain() -> ! {
                     modals.show_notification(t!("mainmenu.cant_sleep", xous::LANG)).expect("couldn't notify that power is plugged in");
                 } else {
                     susres.initiate_suspend().expect("couldn't initiate suspend op");
+                }
+            },
+            Some(StatusOpcode::BatteryDisconnect) => {
+                if ((llio.adc_vbus().unwrap() as f64) * 0.005033) > 1.5 {
+                    modals.show_notification(t!("mainmenu.cant_sleep", xous::LANG)).expect("couldn't notify that power is plugged in");
+                } else {
+                    gam.shipmode_blank_request().ok();
+                    ticktimer.sleep_ms(500).unwrap();
+                    llio.allow_ec_snoop(true).unwrap();
+                    llio.allow_power_off(true).unwrap();
+                    com.ship_mode().unwrap();
+                    com.power_off_soc().unwrap();
                 }
             },
             Some(StatusOpcode::Quit) => {

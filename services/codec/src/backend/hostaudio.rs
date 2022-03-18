@@ -26,6 +26,14 @@ impl Codec {
     pub fn free_play_frames(&self) -> usize {
         0
     }
+
+    pub fn can_play(&self) -> bool {
+        false
+    }
+
+    pub fn drain(&mut self) {
+    }
+
     pub fn available_rec_frames(&self) -> usize {
         0
     }
@@ -82,7 +90,7 @@ impl Codec {
     pub fn set_speaker_gain_db(&mut self, _gain_db: f32) {
     }
 
-    pub fn set_headphone_gain_db(&mut self, _gain_db: f32) {
+    pub fn set_headphone_gain_db(&mut self, _gain_db_l: f32, _gain_db_r: f32) {
     }
 
 }
