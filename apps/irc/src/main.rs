@@ -76,7 +76,7 @@ fn xmain() -> ! {
 
     let connection = IRCConnection {
         callback_sid: sid,
-        nickname: "gsora_precursor".to_string(),
+        nickname: "bunnie_precursor".to_string(),
         server: "irc.libera.chat:6667".to_string(),
         channel: DEFAULT_CHANNEL.to_string(),
         callback_new_message: ReplOp::MessageReceived.to_u32().unwrap(),
