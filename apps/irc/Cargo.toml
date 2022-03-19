@@ -26,10 +26,8 @@ com = {path = "../../services/com"}
 llio = {path = "../../services/llio"}
 codec = {path = "../../services/codec"}
 loirc = "0.2.0"
-#loirc = {path = "./loirc"}
 encoding = "0.2.33"
 hiirc = "0.5.0"
-#hiirc = {path = "./hiirc"}
 rkyv = {version = "0.4.3", features = ["const_generics"], default-features = false}
 net = {path = "../../services/net"}
 com_rs-ref = {path = "../../imports/com_rs-ref"}
